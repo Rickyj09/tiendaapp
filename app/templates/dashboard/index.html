@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h1 class="mb-3">Dashboard</h1>
+        <p>Bienvenido, {{ current_user.nombre }}.</p>
+
+        <div class="d-flex gap-2 flex-wrap mt-3">
+            <a href="{{ url_for('categorias.index') }}" class="btn btn-outline-dark">
+                Ir a categorías
+            </a>
+            <a href="{{ url_for('productos.index') }}" class="btn btn-outline-dark">
+                Ir a productos
+            </a>
+            <a href="{{ url_for('inventario.index') }}" class="btn btn-outline-dark">
+                Ir a inventario
+            </a>
+            <a href="{{ url_for('ventas.nueva') }}" class="btn btn-dark">
+                Nueva venta
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

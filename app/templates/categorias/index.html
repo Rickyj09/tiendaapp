@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Categorías{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">Categorías</h1>
+    <a href="{{ url_for('categorias.nuevo') }}" class="btn btn-dark">
+        Nueva categoría
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        {% if categorias %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th style="width: 220px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for categoria in categorias %}
+                        <tr>
+                            <td>{{ categoria.id }}</td>
+                            <td>{{ categoria.nombre }}</td>
+                            <td>{{ categoria.descripcion or '-' }}</td>
+                            <td>
+                                {% if categoria.activo %}
+                                    <span class="badge bg-success">Activa</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactiva</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <a href="{{ url_for('categorias.editar', categoria_id=categoria.id) }}"
+                                       class="btn btn-sm btn-primary">
+                                        Editar
+                                    </a>
+
+                                    <form method="POST"
+                                          action="{{ url_for('categorias.toggle_estado', categoria_id=categoria.id) }}"
+                                          class="d-inline">
+                                        {% if categoria.activo %}
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                Inactivar
+                                            </button>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-sm btn-outline-success">
+                                                Activar
+                                            </button>
+                                        {% endif %}
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="mb-0 text-muted">No hay categorías registradas todavía.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

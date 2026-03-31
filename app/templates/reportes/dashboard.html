@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-4">Reportes</h1>
+
+<div class="row g-4 mb-4">
+
+    <div class="col-12 col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>Ventas de hoy</h5>
+                <h2>${{ '%.2f' | format(total_hoy) }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>Ventas últimos 7 días</h5>
+                <h2>${{ '%.2f' | format(total_7) }}</h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4">
+
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>Productos con stock bajo</h5>
+
+                {% if productos_bajo %}
+                    <ul class="list-group">
+                        {% for p in productos_bajo %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                {{ p.nombre }}
+                                <span class="badge bg-danger">
+                                    {{ p.stock_actual }}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">Todo en stock correcto</p>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5>Top productos vendidos</h5>
+
+                {% if top_productos %}
+                    <ul class="list-group">
+                        {% for nombre, total in top_productos %}
+                            <li class="list-group-item d-flex justify-content-between">
+                                {{ nombre }}
+                                <span class="badge bg-success">
+                                    {{ total }}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">Sin ventas aún</p>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
