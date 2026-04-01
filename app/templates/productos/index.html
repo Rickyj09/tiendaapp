@@ -43,7 +43,7 @@
                             <th>Stock</th>
                             <th>Stock mínimo</th>
                             <th>Estado</th>
-                            <th style="width: 220px;">Acciones</th>
+                            <th style="width: 300px;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -73,26 +73,34 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <a href="{{ url_for('productos.editar', producto_id=producto.id) }}"
-                                       class="btn btn-sm btn-primary">
-                                        Editar
-                                    </a>
+                               <div class="d-flex gap-2 flex-wrap">
+       <a href="{{ url_for('productos.etiquetas') }}" class="btn btn-dark">
+    Imprimir etiquetas
+</a>                         
+    <a href="{{ url_for('productos.editar', producto_id=producto.id) }}"
+       class="btn btn-sm btn-primary">
+        Editar
+    </a>
 
-                                    <form method="POST"
-                                          action="{{ url_for('productos.toggle_estado', producto_id=producto.id) }}"
-                                          class="d-inline">
-                                        {% if producto.activo %}
-                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
-                                                Inactivar
-                                            </button>
-                                        {% else %}
-                                            <button type="submit" class="btn btn-sm btn-outline-success">
-                                                Activar
-                                            </button>
-                                        {% endif %}
-                                    </form>
-                                </div>
+    <a href="{{ url_for('productos.ver_codigo', producto_id=producto.id) }}"
+       class="btn btn-sm btn-dark">
+        Código
+    </a>
+
+    <form method="POST"
+          action="{{ url_for('productos.toggle_estado', producto_id=producto.id) }}"
+          class="d-inline">
+        {% if producto.activo %}
+            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                Inactivar
+            </button>
+        {% else %}
+            <button type="submit" class="btn btn-sm btn-outline-success">
+                Activar
+            </button>
+        {% endif %}
+    </form>
+</div>
                             </td>
                         </tr>
                         {% endfor %}

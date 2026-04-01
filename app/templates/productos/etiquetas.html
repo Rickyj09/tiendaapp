@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Etiquetas{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Etiquetas de productos</h1>
+
+    <div class="d-flex gap-2">
+        <button class="btn btn-dark" onclick="window.print()">Imprimir</button>
+        <a href="{{ url_for('productos.index') }}" class="btn btn-outline-secondary">
+            Volver
+        </a>
+    </div>
+</div>
+
+<div class="sheet">
+    {% for producto in productos %}
+        {% if producto.codigo_barras %}
+        <div class="label">
+            <div class="label-body">
+                <div class="nombre">{{ producto.nombre }}</div>
+                <div class="precio">
+                    USD {{ '%.2f' | format(producto.precio_venta) }}
+                </div>
+
+                <svg class="barcode"
+                     data-code="{{ producto.codigo_barras }}"></svg>
+
+                <div class="codigo">
+                    {{ producto.codigo_barras }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".barcode").forEach(el => {
+        const code = el.getAttribute("data-code");
+
+        JsBarcode(el, code, {
+            format: "CODE128",
+            width: 1.5,
+            height: 50,
+            displayValue: false,
+            margin: 0
+        });
+    });
+});
+</script>
+
+<style>
+/* Hoja */
+.sheet {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+/* Etiqueta */
+.label {
+    border: 1px solid #ccc;
+    padding: 8px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.label-body {
+    text-align: center;
+    width: 100%;
+}
+
+.nombre {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.precio {
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.codigo {
+    font-size: 10px;
+}
+
+/* Impresión */
+@media print {
+    nav,
+    .btn {
+        display: none !important;
+    }
+
+    body {
+        margin: 0;
+        background: white;
+    }
+
+    .sheet {
+        gap: 5px;
+    }
+
+    .label {
+        border: 1px dashed #999;
+    }
+}
+</style>
+{% endblock %}

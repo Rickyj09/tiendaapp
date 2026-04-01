@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Código de barras{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h1 class="mb-4">Código de barras</h1>
+
+                <div class="mb-3">
+                    <h3 class="mb-1">{{ producto.nombre }}</h3>
+                    <div class="text-muted">Código interno: {{ producto.codigo }}</div>
+                    <div class="text-muted">
+                        Precio: USD {{ '%.2f' | format(producto.precio_venta) }}
+                    </div>
+                </div>
+
+                {% if producto.codigo_barras %}
+                    <div class="my-4">
+                        <svg id="barcode"></svg>
+                    </div>
+
+                    <div class="fw-bold fs-5 mb-4">
+                        {{ producto.codigo_barras }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        Este producto no tiene código de barras asignado.
+                    </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <a href="{{ url_for('productos.index') }}" class="btn btn-outline-secondary">
+                        Volver
+                    </a>
+
+                    {% if producto.codigo_barras %}
+                        <button type="button" class="btn btn-dark" onclick="window.print()">
+                            Imprimir
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if producto.codigo_barras %}
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    JsBarcode("#barcode", "{{ producto.codigo_barras }}", {
+        format: "CODE128",
+        lineColor: "#000",
+        width: 2,
+        height: 80,
+        displayValue: true,
+        fontSize: 18,
+        margin: 10
+    });
+});
+</script>
+{% endif %}
+
+<style>
+@media print {
+    nav,
+    .btn,
+    .alert {
+        display: none !important;
+    }
+
+    body {
+        background: #fff !important;
+    }
+
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+</style>
+{% endblock %}

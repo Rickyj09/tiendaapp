@@ -7,6 +7,7 @@ from app.blueprints.productos import productos_bp
 from app.extensions import db
 from app.models.categoria import Categoria
 from app.models.producto import Producto
+from app.utils import generar_codigo_barras_producto
 
 
 def _to_decimal(valor, default="0.00"):
@@ -14,6 +15,8 @@ def _to_decimal(valor, default="0.00"):
         texto = (valor or "").strip().replace(",", ".")
         if texto == "":
             texto = default
+        if texto == "":
+            return None
         return Decimal(texto)
     except (InvalidOperation, AttributeError):
         return None
@@ -106,13 +109,17 @@ def nuevo():
             flash("El stock mínimo no es válido.", "danger")
             return render_template("productos/form.html", producto=None, categorias=categorias)
 
-        existe_codigo = Producto.query.filter(db.func.lower(Producto.codigo) == codigo.lower()).first()
+        existe_codigo = Producto.query.filter(
+            db.func.lower(Producto.codigo) == codigo.lower()
+        ).first()
         if existe_codigo:
             flash("Ya existe un producto con ese código.", "warning")
             return render_template("productos/form.html", producto=None, categorias=categorias)
 
         if codigo_barras:
-            existe_barras = Producto.query.filter(Producto.codigo_barras == codigo_barras).first()
+            existe_barras = Producto.query.filter(
+                Producto.codigo_barras == codigo_barras
+            ).first()
             if existe_barras:
                 flash("Ya existe un producto con ese código de barras.", "warning")
                 return render_template("productos/form.html", producto=None, categorias=categorias)
@@ -132,6 +139,11 @@ def nuevo():
         )
 
         db.session.add(producto)
+        db.session.flush()
+
+        if not producto.codigo_barras:
+            producto.codigo_barras = generar_codigo_barras_producto(producto.id)
+
         db.session.commit()
 
         flash("Producto creado correctamente.", "success")
@@ -218,7 +230,12 @@ def editar(producto_id):
         producto.stock_actual = stock_actual
         producto.stock_minimo = stock_minimo
         producto.unidad_medida = unidad_medida if unidad_medida else None
-        producto.codigo_barras = codigo_barras if codigo_barras else None
+
+        if codigo_barras:
+            producto.codigo_barras = codigo_barras
+        elif not producto.codigo_barras:
+            producto.codigo_barras = generar_codigo_barras_producto(producto.id)
+
         producto.activo = activo
 
         db.session.commit()
@@ -227,6 +244,13 @@ def editar(producto_id):
         return redirect(url_for("productos.index"))
 
     return render_template("productos/form.html", producto=producto, categorias=categorias)
+
+
+@productos_bp.route("/<int:producto_id>/codigo")
+@login_required
+def ver_codigo(producto_id):
+    producto = Producto.query.get_or_404(producto_id)
+    return render_template("productos/codigo.html", producto=producto)
 
 
 @productos_bp.route("/<int:producto_id>/toggle", methods=["POST"])
@@ -242,3 +266,9 @@ def toggle_estado(producto_id):
         flash("Producto inactivado correctamente.", "info")
 
     return redirect(url_for("productos.index"))
+
+@productos_bp.route("/etiquetas")
+@login_required
+def etiquetas():
+    productos = Producto.query.filter_by(activo=True).order_by(Producto.nombre.asc()).all()
+    return render_template("productos/etiquetas.html", productos=productos)
